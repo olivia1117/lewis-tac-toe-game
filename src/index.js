@@ -4,15 +4,23 @@ credits: this was taken from the React tic-tac-toe tutorial
 and modified by myself
 */
 
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import React from "react";
+import ReactDOM from "react-dom/client";
 import "./styles.css";
+import Game from "./App"; 
+import { Auth0Provider } from "@auth0/auth0-react";
 
-import App from "./App";
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
-const root = createRoot(document.getElementById("root"));
 root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+  <Auth0Provider
+    domain={process.env.DOMAIN}  
+    clientId={process.env.CLIENT_ID}
+    authorizationParams={{
+      redirect_uri: window.location.origin,
+    }}
+  >
+    <Game />
+  </Auth0Provider>
 );
+

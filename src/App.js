@@ -5,6 +5,8 @@ and modified by myself
 */
 
 import { useState } from 'react';
+import { useAuth0 } from "@auth0/auth0-react";   // <-- ADDED
+
 
 function Square({ value, onSquareClick }) {
   return (
@@ -20,23 +22,14 @@ function Board({ xIsNext, squares, onPlay }) {
       return;
     }
     const nextSquares = squares.slice();
-    if (xIsNext) {
-      nextSquares[i] = 'X';
-    } else {
-      nextSquares[i] = 'O';
-    }
+    nextSquares[i] = xIsNext ? 'X' : 'O';
     onPlay(nextSquares);
   }
 
-
   const winner = calculateWinner(squares);
-  
-  let status;
-  if (winner) {
-    status = 'Winner: ' + winner;
-  } else {
-    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
-  }
+  const status = winner
+    ? 'Winner: ' + winner
+    : 'Next player: ' + (xIsNext ? 'X' : 'O');
 
   return (
     <>
@@ -61,8 +54,13 @@ function Board({ xIsNext, squares, onPlay }) {
 }
 
 export default function Game() {
+
+  // ⬇⬇⬇ AUTH0 LOGIC IN YOUR GAME COMPONENT
+  const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
+
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
+
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
@@ -77,12 +75,7 @@ export default function Game() {
   }
 
   const moves = history.map((squares, move) => {
-    let description;
-    if (move > 0) {
-      description = 'Go to move #' + move;
-    } else {
-      description = 'Go to game start';
-    }
+    const description = move > 0 ? 'Go to move #' + move : 'Go to game start';
     return (
       <li key={move}>
         <button onClick={() => jumpTo(move)}>{description}</button>
@@ -92,15 +85,45 @@ export default function Game() {
 
   return (
     <div className="game">
-      <div>
-        <h1 className="game-title">Lewis-Tac-Azure</h1>
-      </div>
+
+      {/* AUTH0 HEADER SECTION */}
+      <header className="header">
+        <h1 className="game-title">Lewis-Tac-Toe</h1>
+
+        <div className="auth-controls">
+          {!isAuthenticated ? (
+            <button className="btn" onClick={() => loginWithRedirect()}>
+              Login
+            </button>
+          ) : (
+            <>
+              <p className="welcome">Welcome, {user.name}</p>
+              <button
+                className="btn logout"
+                onClick={() =>
+                  logout({ logoutParams: { returnTo: window.location.origin } })
+                }
+              >
+                Logout
+              </button>
+            </>
+          )}
+        </div>
+      </header>
+
+      {/* GAME CONTENT */}
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <Board
+          xIsNext={xIsNext}
+          squares={currentSquares}
+          onPlay={handlePlay}
+        />
       </div>
+
       <div className="game-info">
         <ol>{moves}</ol>
       </div>
+
     </div>
   );
 }
