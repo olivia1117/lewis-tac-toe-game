@@ -19,6 +19,14 @@ jobs:
         with:
           submodules: true
           lfs: false
+          
+      # Add this step to enable debug logging
+      - name: Enable Debug Logging
+        run: echo "##[debug]Debug logging enabled"
+
+      # Add this step to print all environment variables
+      - name: Print Environment Variables
+        run: printenv
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
