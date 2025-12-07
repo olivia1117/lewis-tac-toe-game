@@ -5,8 +5,7 @@ and modified by myself
 */
 
 import { useState } from 'react';
-import { useAuth0 } from "@auth0/auth0-react";   // <-- ADDED
-
+import { useAuth0 } from "@auth0/auth0-react";
 
 function Square({ value, onSquareClick }) {
   return (
@@ -53,9 +52,8 @@ function Board({ xIsNext, squares, onPlay }) {
   );
 }
 
-export default function Game() {
+export default function App() {
 
-  // ⬇⬇⬇ AUTH0 LOGIC IN YOUR GAME COMPONENT
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
 
   const [history, setHistory] = useState([Array(9).fill(null)]);
@@ -85,8 +83,6 @@ export default function Game() {
 
   return (
     <div className="game">
-
-      {/* AUTH0 HEADER SECTION */}
       <header className="header">
         <h1 className="game-title">Lewis-Tac-Toe</h1>
 
@@ -111,7 +107,6 @@ export default function Game() {
         </div>
       </header>
 
-      {/* GAME CONTENT */}
       <div className="game-board">
         <Board
           xIsNext={xIsNext}
@@ -123,7 +118,6 @@ export default function Game() {
       <div className="game-info">
         <ol>{moves}</ol>
       </div>
-
     </div>
   );
 }
