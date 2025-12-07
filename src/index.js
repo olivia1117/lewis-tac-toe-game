@@ -14,12 +14,13 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <Auth0Provider
-    domain={process.env.DOMAIN}  
-    clientId={process.env.CLIENT_ID}
+    domain={process.env.AUTH0_DOMAIN}  
+    clientId={process.env.AUTH0_CLIENT_ID}
     authorizationParams={{
       redirect_uri: window.location.origin,
     }}
   >
+
     <Game />
   </Auth0Provider>
 );
