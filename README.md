@@ -3,7 +3,7 @@
 ### Welcome to the README.md File!
 
 
-Link to Lewis Architecture - https://www.lewisunivcs.com/
+Link to Lewis Architecture - https://docs.lewisunivcs.com/
 
 ### Credits
 - Link to original repository for web template by Eric Pogue: https://github.com/EricPogueExampleCode-Web/merna-static-on-azure-2024
