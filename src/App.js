@@ -4,7 +4,7 @@ credits: this was taken from the React tic-tac-toe tutorial
 and modified by myself
 */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import PlayerStats from "./PlayerStats";
 
@@ -76,6 +76,42 @@ function calculateWinner(squares) {
 export default function App() {
   const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0();
 
+  // Stores login history
+  const [loginHistory, setLoginHistory] = useState([]);
+
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      //replace for prod: lewis-tac-toe-server.azurewebsites.net
+      //replace for local testing: http://localhost:3000
+      // also make sure your server supports https in production
+      fetch("https://lewis-tac-toe-server.azurewebsites.net/api/log-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.name,
+          timestamp: new Date().toISOString()
+        })
+      });
+    }
+  }, [isAuthenticated, user]);
+
+  async function loadHistory() {
+    //replace for prod: lewis-tac-toe-server.azurewebsites.net
+    //replace for local testing: http://localhost:3000
+    // also make sure your server supports https in production
+    const res = await fetch("https://lewis-tac-toe-server.azurewebsites.net/api/logins");
+    const data = await res.json();
+    setLoginHistory(data);
+  }
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadHistory();
+    }
+  }, [isAuthenticated]);
+
   const [stats, setStats] = useState({
     gamesPlayed: 0,
     gamesWon: 0,
@@ -85,7 +121,7 @@ export default function App() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
 
-  const playerSymbol = "X"; // Default player to X
+  const playerSymbol = "X";
   const computerSymbol = "O";
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
@@ -104,13 +140,11 @@ export default function App() {
         gamesLost: winner !== playerSymbol ? prevStats.gamesLost + 1 : prevStats.gamesLost,
       }));
     } else if (!nextSquares.includes(null)) {
-      // If no winner and no empty squares, it's a draw
       setStats((prevStats) => ({
         ...prevStats,
         gamesPlayed: prevStats.gamesPlayed + 1,
       }));
     } else if (xIsNext === (playerSymbol === "X")) {
-      // Computer's turn
       const computerMove = calculateComputerMove(nextSquares);
       if (computerMove !== null) {
         nextSquares[computerMove] = computerSymbol;
@@ -121,7 +155,6 @@ export default function App() {
   }
 
   function calculateComputerMove(squares) {
-    // Simple AI: pick the first available square
     for (let i = 0; i < squares.length; i++) {
       if (squares[i] === null) {
         return i;
@@ -182,6 +215,21 @@ export default function App() {
       </div>
 
       {isAuthenticated && <PlayerStats stats={stats} />}
+
+      
+      {isAuthenticated && (
+        <div className="login-history">
+          <h2>Login History</h2>
+          <ul>
+            {loginHistory.map((entry, index) => (
+              <li key={index}>
+                {entry.name} ({entry.email}) logged in at{" "}
+                {new Date(entry.timestamp).toLocaleString()}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
