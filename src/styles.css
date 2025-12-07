@@ -115,3 +115,24 @@ body {
   padding: 6px 12px; 
   margin-bottom: 4px; 
 }
+
+.player-stats {
+  margin-top: 20px;
+  padding: 10px;
+  border: 2px solid #2196f3;
+  background-color: #e3f2fd;
+  text-align: center;
+}
+
+.player-stats h2 {
+  color: #0d47a1;
+}
+
+.player-stats ul {
+  list-style: none;
+  padding: 0;
+}
+
+.player-stats li {
+  margin: 5px 0;
+}
