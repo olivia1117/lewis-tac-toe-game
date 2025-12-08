@@ -97,20 +97,43 @@ export default function App() {
     }
   }, [isAuthenticated, user]);
 
+  //replace for prod: lewis-tac-toe-server.azurewebsites.net
+  //replace for local testing: http://localhost:3000
+  // also make sure your server supports https in production
+  // Load login history safely
   async function loadHistory() {
-    //replace for prod: lewis-tac-toe-server.azurewebsites.net
-    //replace for local testing: http://localhost:3000
-    // also make sure your server supports https in production
-    const res = await fetch("https://lewis-tac-toe-server.azurewebsites.net/api/logins");
-    const data = await res.json();
-    setLoginHistory(data);
+    try {
+      const res = await fetch("https://lewis-tac-toe-server.azurewebsites.net/api/logins");
+
+      if (!res.ok) {
+        console.error("History request failed:", res.status);
+        setLoginHistory([]); 
+        return;
+      }
+
+      const data = await res.json();
+
+      if (!Array.isArray(data)) {
+        console.warn("Login history response was not an array:", data);
+        setLoginHistory([]);
+        return;
+      }
+
+      setLoginHistory(data);
+    } catch (err) {
+      console.error("Error fetching login history:", err);
+      setLoginHistory([]);
+    }
   }
 
   useEffect(() => {
     if (isAuthenticated) {
-      loadHistory();
+      // Slight delay to ensure log is written before fetching
+      setTimeout(() => loadHistory(), 600);
     }
   }, [isAuthenticated]);
+
+  ///
 
   const [stats, setStats] = useState({
     gamesPlayed: 0,
@@ -216,14 +239,12 @@ export default function App() {
 
       {isAuthenticated && <PlayerStats stats={stats} />}
 
-      
-  {isAuthenticated && <PlayerStats stats={stats} />}
 
   {isAuthenticated && (
     <div className="login-history">
       <h2>Login History</h2>
       <ul>
-        {Array.isArray(loginHistory) ? (
+        {loginHistory.length > 0 ? (
           loginHistory.map((entry, index) => (
             <li key={index}>
               {entry.name} ({entry.email}) logged in at{" "}
@@ -231,13 +252,14 @@ export default function App() {
             </li>
           ))
         ) : (
-          <li>No login history available or failed to load.</li>
+          <li>No login history available.</li>
         )}
       </ul>
     </div>
   )}
     </div>
   );
+
 }
 
 
