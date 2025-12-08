@@ -7,6 +7,8 @@ and modified by myself
 import React, { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import PlayerStats from "./PlayerStats";
+import FileManager from "./FileManager";
+
 
 function Square({ value, onSquareClick }) {
   return (
@@ -238,6 +240,8 @@ export default function App() {
       </div>
 
       {isAuthenticated && <PlayerStats stats={stats} />}
+      {isAuthenticated && <FileManager user={user} />}
+
 
 
   {isAuthenticated && (
