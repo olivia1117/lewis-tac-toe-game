@@ -217,19 +217,27 @@ export default function App() {
       {isAuthenticated && <PlayerStats stats={stats} />}
 
       
-      {isAuthenticated && (
-        <div className="login-history">
-          <h2>Login History</h2>
-          <ul>
-            {loginHistory.map((entry, index) => (
-              <li key={index}>
-                {entry.name} ({entry.email}) logged in at{" "}
-                {new Date(entry.timestamp).toLocaleString()}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+  {isAuthenticated && <PlayerStats stats={stats} />}
+
+  {isAuthenticated && (
+    <div className="login-history">
+      <h2>Login History</h2>
+      <ul>
+        {Array.isArray(loginHistory) ? (
+          loginHistory.map((entry, index) => (
+            <li key={index}>
+              {entry.name} ({entry.email}) logged in at{" "}
+              {new Date(entry.timestamp).toLocaleString()}
+            </li>
+          ))
+        ) : (
+          <li>No login history available or failed to load.</li>
+        )}
+      </ul>
+    </div>
+  )}
     </div>
   );
 }
+
+
